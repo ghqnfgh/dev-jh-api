@@ -24,6 +24,8 @@ class HomeController extends Controller
 		->where("mode","0")
 		->orderby("sort")
 		->leftjoin($GoodsOption->getTable(), "gd_goods_display.goodsno", "=", "gd_goods_option.goodsno")
+		->where("gd_goods_option.go_is_display","=","1")
+		->where("gd_goods_option.go_is_deleted","=","0")
 		->distinct()
 		->get(['gd_goods_display.goodsno as goodsId', 'gd_goods.goodsnm as goodsName','gd_goods.img_i as thumbnailUrl','gd_goods_option.price as goodsPrice']);
 	$popular_product = $goods_display;
@@ -44,32 +46,42 @@ class HomeController extends Controller
      */
     public function getCategoriesList()
     {
-	$Categories = Categories::where("hidden","=","0")
-                                        ->where("level_auth","=","0")
-                                        ->where(DB::raw("LENGTH(category)"),"<=","3")
-                                        ->orderby("sort")
-                                        ->orderby("category")
+	$SubCategories = new Categories();
+	$GoodsCategory = Categories::where("gd_category.hidden","=","0")
+                                        ->where("gd_category.level_auth","=","0")
+                                        ->where(DB::raw("LENGTH(gd_category.category)"),"<=","3")
+                                        ->orderby("gd_category.sort")
+                                        ->orderby("gd_category.category")
                                         ->limit(10)
-                                        ->get(["category","catnm"]);
+                                        ->get(["gd_category.category","gd_category.catnm"]);
+	if($GoodsCategory) {
+            $i = 0;
+            foreach ($GoodsCategory as $GoodsCategorycolumn) {
+                $GoodsCategoryList[$i]["categoryCode"] = $GoodsCategorycolumn["category"];
+                $GoodsCategoryList[$i]["categoryName"] = $GoodsCategorycolumn["catnm"];
+                $GoodsSubCategory = Categories::where("hidden", "=", "0")
+                    ->where("level_auth", "=", "0")
+                    ->where(DB::raw("LENGTH(category)"), "=", "6")
+                    ->where("category", "like", "$GoodsCategorycolumn[category]%")
+                    ->orderby("category")
+                    ->get(["category","catnm"]);
+                //print_r($GoodsSubCategory);
+                $j = 0;
+                foreach ($GoodsSubCategory as $GoodsSubCategorycolumn) {
+                    if ($GoodsCategorycolumn["category"] == "126") {
+                        $hashtag = "#";
+                    } else {
+                        $hashtag = "";
+                    }
+                    $GoodsCategoryList[$i]["subcategories"][$j]["categoryCode"] = $GoodsSubCategorycolumn["category"];
+                    $GoodsCategoryList[$i]["subcategories"][$j]["categoryName"] = $hashtag . $GoodsSubCategorycolumn["catnm"];
+                    $j++;
+                }
+                $i++;
+            }
+        }
 	
 
-	$i = 0;
-        foreach ($Categories as $GoodsCategorycolumn) {
-           $GoodsCategoryList[$i]["no"] = $GoodsCategorycolumn::pluck("category");
-           $GoodsCategoryList[$i]["name"] = $GoodsCategorycolumn::pluck("catnm");
-           $GoodsSubCategory = Categories::where("hidden", "=", "0")
-               ->where("level_auth", "=", "0")
-               ->where(DB::raw("LENGTH(category)"), "=", "6")
-               ->where("category", "like", "$GoodsCategorycolumn[category]%")
-               ->orderby("category")
-		->distinct()
-               ->get(["category","catnm"]);
-	    $i++;
-	}
-	$GoodsCategoryList = Categories::where(DB::raw("length(category)"), "<=","3")
-			->orderby("sort")
-			->get(["category", "catnm"]);
-	
 	$return = [
 		"data" => [
 			"category" => $GoodsCategoryList
@@ -84,54 +96,55 @@ class HomeController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
-     */
+     
     public function store(Request $request)
     {
         //
     }
 
-    /**
+    *
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
-     */
+     *
     public function show($id)
     {
         //
     }
 
-    /**
+    **
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
-     */
+     *
     public function edit($id)
     {
         //
     }
 
-    /**
+    **
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
-     */
+     *
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
+    **
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
-     */
+     *
     public function destroy($id)
     {
         //
     }
+	*/
 }

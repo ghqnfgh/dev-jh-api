@@ -16,6 +16,7 @@ Route::get('/', function(){
 	return view('welcome');});
 Route::get('/v1/main', 'HomeController@getMain');
 Route::get('/v1/main/categories','HomeController@getCategoriesList');
+Route::get('/v1/main/categories/{categoryCode}','GoodsController@getGoodsList');
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
