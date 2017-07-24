@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::get('/', function(){
 	return view('welcome');});
 Route::get('/v1/main', 'HomeController@getMain');
