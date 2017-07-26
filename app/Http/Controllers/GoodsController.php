@@ -12,9 +12,20 @@ use DB;
 
 class GoodsController extends Controller
 {
+	
+	/* Function Summary
+	 *
+	 * 1. @getGoodsList : 카테고리 별 상품 목록 가져오는 함수
+	 *	- $categoryCode : 카테고리 코드 받는 변수
+	 *	- $pageNo : 페이지 넘버링
+	 *	- $pageOff : 한 페이지에 표시되는 상품 갯수
+	 *
+	 *
+	 */
+	
     public function getGoodsList($categoryCode, $pageNo, $pageOffset){
 	
-	$checkFunc = 'CategoryCodeCheck';
+	$checkFunc = 'CategoryCodeCheck'; // 카테고리 코드가 올바른지 판별하기 위해 정의한 함수
 	$checker = call_user_func_array(array($this,$checkFunc),array($categoryCode));
 	
 	if(!$checker){
@@ -25,7 +36,7 @@ class GoodsController extends Controller
 				"system_message" => "categoryCode가 존재하지 않거나 범위를 벗어났습니다"]
 		];
 				
-	return response()->json($error_return,200,[],JSON_UNESCAPED_SLASHES);
+		return response()->json($error_return,200,[],JSON_UNESCAPED_SLASHES);
 	}
 	
 	
@@ -66,6 +77,9 @@ class GoodsController extends Controller
 		"data" => [
 			"goodsLink" => $goods_display
 		],
+		"paging" => [
+			"nextPageNo" => $pageNo+1
+		]
 	];
 		
 	return response()->json($return, 200, [], JSON_UNESCAPED_SLASHES);
@@ -78,15 +92,13 @@ class GoodsController extends Controller
 			->leftjoin($GoodsOption->getTable().' as GO', 'gd_goods.goodsno', '=', 'GO.goodsno') 
 			->where('go_is_display','=','1')
 			->where('go_is_deleted','=','0')
-			->get(['gd_goods.goodsno as goodsId', 'GO.price as goodsPrice','gd_goods.img_i as thumbnailUrl','shortdesc as goodsIntroduction','longdesc as goodInfo']);
+			->get(['gd_goods.goodsnm as goodsName', 'GO.price as goodsPrice','totstock as goodsStock','gd_goods.img_i as thumbnailUrl','shortdesc as goodsIntroduction','longdesc as goodInfo']);
 	
 	$return = [
-		"data" => [
-			'goodsInfo' => $GoodsInformation
-		],
+		"data" => $GoodsInformation
 	];
 	
-	return response()->json($return, 200, [], JSON_UNESCAPED_SLASHES);
+	return response()->json($return, 200,[], JSON_UNESCAPED_SLASHES);
 	
 	
     }
