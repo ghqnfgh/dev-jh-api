@@ -15,11 +15,14 @@ use Illuminate\Http\Request;
 
 Route::get('/', function(){
 	return view('welcome');});
+Route::get('/test', 'DbtestController@index');
 Route::get('/v1/main', 'HomeController@getMain');
 
 Route::get('/v1/main/categories','HomeController@getCategoriesList');
 
-Route::get('/v1/main/categories/{categoryCode}','GoodsController@getGoodsList');
+Route::get('/v1/main/categories/{categoryCode}/{pageNo}/{pageOffset}','GoodsController@getGoodsList');
+//Route::get('/v1/main/categories/{categoryCode}', 'GoodsController@CategoryCodeCheck');
+Route::get('/v1/goods/{goodsId}', 'GoodsController@getGoodsInfo');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

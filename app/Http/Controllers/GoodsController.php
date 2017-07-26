@@ -12,7 +12,44 @@ use DB;
 
 class GoodsController extends Controller
 {
-    public function getGoodsList($categoryCode){
+    public function getGoodsList($categoryCode, $pageNo, $pageOffset){
+	
+	$checkFunc = 'CategoryCodeCheck';
+	$checker = call_user_func_array(array($this,$checkFunc),array($categoryCode));
+	
+	if(!$checker){
+		$error_return = [
+			"error" => [
+				"code" => "3005",
+				"message" => "존재하지 않는 카테고리입니다.",
+				"system_message" => "categoryCode가 존재하지 않거나 범위를 벗어났습니다"]
+		];
+				
+	return response()->json($error_return,200,[],JSON_UNESCAPED_SLASHES);
+	}
+	
+	
+	if($pageNo < 0 || $pageOffset < 0){
+		$error["code"] = "3006";
+		$error["message"] = "<parameter>가 범위를 벗어났습니다.";
+		$error["system_message"] = "";
+	
+		$error_display = [
+			"error" => $error
+		];
+				
+		
+		return response()->json($error_display, 400, [], JSON_UNESCAPED_SLASHES);
+	}
+	
+			
+	if($pageNo == 0){
+		$pageNo = 1;
+	}
+	if($pageOffset <= 0){
+		$pageOffset = 10;
+	}
+	
 	$Goods = new Goods();
 	$GoodsOption = new GoodsOption();
 	$goods_display = GoodsLink::where("category",$categoryCode)
@@ -21,8 +58,8 @@ class GoodsController extends Controller
 		->leftjoin($GoodsOption->getTable(), "gd_goods_link.goodsno", "=", "gd_goods_option.goodsno")
 		->where("gd_goods_option.go_is_display", '=', "1")
 		->where("gd_goods_option.go_is_deleted", '=', "0")
-		->skip(10)
-		->take(10)
+		->skip(10 * ($pageNo - 1))
+		->take($pageOffset)
 		->get(["gd_goods_link.goodsno as goodsId", "gd_goods.goodsnm as goodsName", "gd_goods_option.price as goodsPrice", "gd_goods.img_i as thumbnailUrl"]);
 	
 	$return = [
@@ -32,6 +69,31 @@ class GoodsController extends Controller
 	];
 		
 	return response()->json($return, 200, [], JSON_UNESCAPED_SLASHES);
+
+    }
+    public function getGoodsInfo($goodsId){
+	$GoodsOption = new GoodsOption();
+	
+	$GoodsInformation = Goods::where('gd_goods.goodsno', '=', $goodsId)
+			->leftjoin($GoodsOption->getTable().' as GO', 'gd_goods.goodsno', '=', 'GO.goodsno') 
+			->where('go_is_display','=','1')
+			->where('go_is_deleted','=','0')
+			->get(['gd_goods.goodsno as goodsId', 'GO.price as goodsPrice','gd_goods.img_i as thumbnailUrl','shortdesc as goodsIntroduction','longdesc as goodInfo']);
+	
+	$return = [
+		"data" => [
+			'goodsInfo' => $GoodsInformation
+		],
+	];
+	
+	return response()->json($return, 200, [], JSON_UNESCAPED_SLASHES);
+	
+	
+    }
+    public function CategoryCodeCheck($categoryCode){
+	$Checker = GoodsLink::where("category","=",$categoryCode)
+		->count();
+	return $Checker;
 
     }
 		
