@@ -21,14 +21,16 @@ class HomeController extends Controller
     public function getMain() 
     {
 	/**
-	 * - variable : 
-	 *	 > $Goods : gd_goods 테이블의 정보를 담고 있는 변수
-	 *		* goodsId : 상품 id
-	 *		* goodsName : 상품 이름
-	 *		* thumbnailUrl : 상품 썸네일 이미지
-	 *	 > $GoodsOption : gd_goods_option 테이블의 정보를 담고 있는 변수
-	 *		* goodsPrice : 상품 가격
-	 *	 > $goods_display : gd_goods_display 테이블의 정보를 담고 있는 변수, 인기 있는 상품이 어떤 것인지 정보를 담고 있으며, 해당 정보는 kurly.com의 admin 계정을 통해 변경할 수 있다.
+	 *  variable 
+	 *  - $Goods : gd_goods 테이블의 정보를 담고 있는 변수
+	 *  - $GoodsOption : gd_goods_option 테이블의 정보를 담고 있는 변수
+	 *  - $goods_display : gd_goods_display 테이블의 정보를 담고 있는 변수, 인기 있는 상품이 어떤 것인지 정보를 담고 있으며, 해당 정보는 kurly.com의 admin 계정을 통해 변경할 수 있다.
+	 *  
+	 *  column  
+	 *  @goodsId : 상품코드
+	 *  @goodsName : 상품이름
+	 *  @goodsPrice : 상품가격
+	 *  @thumbnailUrl : 썸네일이미지
 	 */
 	$Goods = new Goods();
 	$GoodsOption = new GoodsOption();
@@ -41,7 +43,7 @@ class HomeController extends Controller
 		->where("gd_goods_option.go_is_display","=","1") // 일반적으로 gd_goods_option테이블에는 상품의 옵션 별 설정이 있음. go_is_display가 '1'인 경우의 레코드는 일반적으로 유저에게 보이는 옵션의 정보를 담고 있는 레코드이기에 조건 추가
 		->where("gd_goods_option.go_is_deleted","=","0") // go_is_deleted 컬럼이 '1'인 경우 삭제된 상품 정보임.
 		->distinct()
-		->get(['gd_goods_display.goodsno as goodsId', 'gd_goods.goodsnm as goodsName','gd_goods.img_i as thumbnailUrl','gd_goods_option.price as goodsPrice']);
+		->get(['gd_goods_display.goodsno as goodsId', 'gd_goods.goodsnm as goodsName','gd_goods_option.price as goodsPrice','gd_goods.img_i as thumbnailUrl']);
 	
 	$popular_product = $goods_display;
 	$return = [
@@ -58,11 +60,15 @@ class HomeController extends Controller
     {
 	
 	/**
-	 * - variable : 
-	 *	 > $GoodsCategory : 최상위 카테고리들을 객체로 담고 있는 변수 
-	 *	 > $GoodsCategoryList : 전체 카테고리에 대한 정보를 담고 있는 객체 변수 
-	 *	 > $upperIter : 최상위 카테고리를 순회할 때 사용
-	 *	 > $subIter : 하위 카테고리를 순회할 때 사용
+	 *  variable : 
+	 *  - $GoodsCategory : 최상위 카테고리들을 객체로 담고 있는 변수 
+	 *  - $GoodsCategoryList : 전체 카테고리에 대한 정보를 담고 있는 객체 변수 
+	 *  - $upperIter : 최상위 카테고리를 순회할 때 사용
+	 *  - $subIter : 하위 카테고리를 순회할 때 사용
+	 *
+	 *  column  
+	 *  @categoryCode : 카테고리 코드
+	 *  @categoryName : 카테고리 이름
 	 */
 	
 	$GoodsCategory = Categories::where(DB::raw("LENGTH(gd_category.category)"), "=","3")// 최상위 카테고리의 경우 000 처럼 3자리로 표현됨.
@@ -100,60 +106,4 @@ class HomeController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     
-    public function store(Request $request)
-    {
-        //
-    }
-
-    *
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     *
-    public function show($id)
-    {
-        //
-    }
-
-    **
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     *
-    public function edit($id)
-    {
-        //
-    }
-
-    **
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     *
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    **
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     *
-    public function destroy($id)
-    {
-        //
-    }
-	*/
 }
