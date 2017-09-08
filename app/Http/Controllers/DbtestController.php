@@ -1,8 +1,14 @@
 <?php
+
+
+namespace App\Http\Controllers;
 use App\Task;
 use App\Project;
-namespace App\Http\Controllers;
+use App\Goods;
+use App\GoodsOption;
+use App\PopularGoods;
 use App\Http\Requests;
+use App\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -15,8 +21,11 @@ class DbtestController extends Controller
      */
     public function index()
     {
-	$qwer = DB::select('select * from gd_category order by category');
-	return response()->json($qwer, 200, [], JSON_PRETTY_PRINT);
+	$subcategory = new Category;
+	$category = Category::leftjoin($subcategory->getTable().' as subC',  
+
+		
+	return response()->json($Parent, 200, [], JSON_PRETTY_PRINT);
 //	return view('data', ['qwer' => $qwer]);
         //
     }

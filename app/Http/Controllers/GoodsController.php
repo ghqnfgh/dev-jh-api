@@ -7,6 +7,7 @@ use App\Goods;
 use App\GoodsOption;
 use App\Categories;
 use App\GoodsLink;
+use App\Http\Middleware\Cors;
 
 use DB;
 
@@ -77,17 +78,27 @@ class GoodsController extends Controller
 	
 	$Goods = new Goods(); // gd_goods테이블 연결
 	$GoodsOption = new GoodsOption(); // gd_goods_option 테이블 연결
+
+	$GoodsCategory = Categories::where("gd_category.category", "=", $categoryCode)
+		->get(['catnm as categoryName']);
+	
 	$goods_display = GoodsLink::where("category",$categoryCode) // 찾길 원하는 카테고리 코드 적용
 		->leftjoin($Goods->getTable(), "gd_goods.goodsno", "=", "gd_goods_link.goodsno") // 상품의 간단한 정보를 가져오기 위해 gd_goods 테이블 연결
 		->distinct()
 		->leftjoin($GoodsOption->getTable(), "gd_goods_link.goodsno", "=", "gd_goods_option.goodsno") // 상품 가격정보 확인 위해 gd_goods_option 테이블 연결
 		->where("gd_goods_option.go_is_display", '=', "1") 
 		->where("gd_goods_option.go_is_deleted", '=', "0")
+		->where("gd_goods.img_y", "!=", "")
+		->where("gd_goods_option.price", "!=", "0")
+		->where("gd_goods.longdesc","!=","")
+		->where("gd_goods.totstock",">","0")
+		->orderby("price","asc")
 		->skip(10 * ($pageNo - 1)) // 입력받은 pageNo 변수를 활용해 페이징
 		->take($pageOffset) // 입력받은 pageOffset 변수 활용해 한 페이지에 상품 몇 개를 표시할 것인지 구성
-		->get(["gd_goods_link.goodsno as goodsId", "gd_goods.goodsnm as goodsName", "gd_goods_option.price as goodsPrice", "gd_goods.img_i as thumbnailUrl"]);
+		->get(["gd_goods_link.goodsno as goodsId", "gd_goods.goodsnm as goodsName", "gd_goods_option.price as goodsPrice", "gd_goods.img_y as thumbnailUrl"]);
 	
 	$return = [
+		"category" => $GoodsCategory,
 		"data" => [
 			"goodsLink" => $goods_display
 		],
@@ -135,7 +146,7 @@ class GoodsController extends Controller
 			->leftjoin($GoodsOption->getTable().' as GO', 'gd_goods.goodsno', '=', 'GO.goodsno') 
 			->where('go_is_display','=','1')
 			->where('go_is_deleted','=','0')
-			->get(['gd_goods.goodsnm as goodsName', 'GO.price as goodsPrice','totstock as goodsStock','gd_goods.img_i as thumbnailUrl','shortdesc as goodsIntroduction','longdesc as goodInfo']);
+			->get(['gd_goods.goodsnm as goodsName', 'GO.price as goodsPrice','totstock as goodsStock','gd_goods.img_y as thumbnailUrl','shortdesc as goodsIntroduction','longdesc as goodInfo']);
 	
 	$return = [
 		"data" => $GoodsInformation

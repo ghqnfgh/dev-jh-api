@@ -37,6 +37,7 @@ class HomeController extends Controller
 		
 	
 	$goods_display = PopularGoods::leftjoin($Goods->getTable(), "gd_goods.goodsno", "=", "gd_goods_display.goodsno")
+		->where("gd_goods.goodsno","!=","6655")
 		->where("mode","0") // mode : gd_goods_display 테이블에서 가져옴. mode에 따라 원하는 상품리스트를 선택 가능함. 0번 : 인기 상품 목록
 		->orderby("sort") // sort : gd_goods_display. 상품 목록의 순서 배치하는 용도로 사용.
 		->leftjoin($GoodsOption->getTable(), "gd_goods_display.goodsno", "=", "gd_goods_option.goodsno") // gd_goods_option 테이블 사용하기 위해 join.

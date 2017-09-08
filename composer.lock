@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a90dc066f1f06f27fa22fdb82fe18d83",
+    "content-hash": "a887c6b6ae49b3af0ef3c9b6a924af23",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -296,6 +296,51 @@
                 }
             ],
             "time": "2015-04-20T18:58:01+00:00"
+        },
+        {
+            "name": "klaravel/db-logger",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/klaravel/db-logger.git",
+                "reference": "34b3b5355d88537a3652dfad413cbbafa2bf5680"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/klaravel/db-logger/zipball/34b3b5355d88537a3652dfad413cbbafa2bf5680",
+                "reference": "34b3b5355d88537a3652dfad413cbbafa2bf5680",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Klaravel\\DbLogger\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Keyur Ajmera",
+                    "email": "ajmerainfo@gmail.com"
+                }
+            ],
+            "description": "Laravel database/sql queries logger.",
+            "keywords": [
+                "db",
+                "db-logger",
+                "laravel",
+                "log",
+                "logger",
+                "sql",
+                "sql-logger"
+            ],
+            "time": "2016-10-03T05:43:44+00:00"
         },
         {
             "name": "laravel/framework",
@@ -632,6 +677,49 @@
                 "debugbar"
             ],
             "time": "2017-01-05T08:46:19+00:00"
+        },
+        {
+            "name": "mnabialek/laravel-sql-logger",
+            "version": "v1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mnabialek/laravel-sql-logger.git",
+                "reference": "1c6e0e054bcaf69b7ec83537f15f0300de29806e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mnabialek/laravel-sql-logger/zipball/1c6e0e054bcaf69b7ec83537f15f0300de29806e",
+                "reference": "1c6e0e054bcaf69b7ec83537f15f0300de29806e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Mnabialek\\LaravelSqlLogger\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marcin Nabiałek",
+                    "email": "gitre@nabialek.org"
+                }
+            ],
+            "description": "Log SQL queries in Laravel/Lumen framework",
+            "keywords": [
+                "laravel",
+                "log",
+                "logger",
+                "lumen",
+                "sql"
+            ],
+            "time": "2017-01-24T19:28:44+00:00"
         },
         {
             "name": "monolog/monolog",

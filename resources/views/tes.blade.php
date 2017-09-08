@@ -3,7 +3,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 </head>
 <body>
-<div id="goods"></div>
+<table id="goods"></table>
 <script>
 	var settings = {
 		"async" : true,
@@ -13,8 +13,17 @@
 		"headers" : {}
 	}
 	$.ajax(settings).done(function(response){
+		var table ="<tr><th>goodsId</th><th>goodsName</th><th>goodsPrice</th><th>thumbnailUrl</th></tr>";
 		console.log(response);
-		$("#goods").html(response.data.popularGoods[1].goodsName);
+		for(i = 0; i < response.data.popularGoods.length; i++){
+			table += "<tr><td>" + response.data.popularGoods[i].goodsId +
+				"</td><td>" + response.data.popularGoods[i].goodsName +
+				"</td><td>" + response.data.popularGoods[i].goodsPrice +
+				"</td><td>" + response.data.popularGoods[i].thumbnailUrl +
+				"</td></tr>";
+		}
+		$("#goods").html(table);
+
 	});
 	
 
