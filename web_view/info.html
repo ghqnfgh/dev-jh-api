@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
+    <script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <!-- 합쳐지고 최소화된 최신 CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- 부가적인 테마 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <title>Minikurly-상세정보</title>
+    <style>
+        #goodsTitle{
+            width:100%;
+            text-align:center;
+            font-size:45px;
+            background-color:purple;
+            color:white;
+            font-weight:bold;
+            height:8%;
+            position:fixed;
+            padding-top: 3%;
+            padding-bottom:3%;
+        }
+        .SInfo{
+            width:100%;
+            text-align:center;
+            font-size:54px;
+        }
+        #goodsIntroduction{
+            font-weight:bold;
+            padding-top : 3%;
+            padding-bottom:3%;
+            border-bottom: 1px solid black;
+        }
+        #goodsDetailInfo{
+            width:100%;
+        }
+        .goodsShell{
+            font-size : 54px;
+            padding-top : 3%;
+            padding-bottom:3%;
+
+            text-align:center;
+        }
+        #goodsThumbnail{
+            padding-top:8%;
+            height:auto;
+
+        }
+
+
+    </style>
+</head>
+<body>
+<div style="align-content:center">
+    <div id = "goodsTitle">
+    </div>
+    <div id = "goodsSimpleInfo" style="width:100%;">
+        <div id = "goodsThumbnail" class="SInfo" style=""></div>
+        <div id = "goodsIntroduction" class="SInfo"></div>
+        <div class ="Sinfo" style="width:100%;padding-bottom:3%;border-bottom: 1px solid black;">
+        <table style="table-layout:fixed; width:100%;"><colgroup><col style="width:50%;"><col style="width:50%;"></colgroup>
+            <tr>
+                <td id = "goodsPrice" class = "goodsShell"></td>
+                <td id = "goodsStock" class = "goodsShell"></td>
+            </tr></table>
+        </div>
+    </div>
+</div>
+<div id = "goodsDetailInfo" >
+
+</div>
+<script>
+    var goodsId = getQueryVariable("goodsId");
+    function getQueryVariable(variable)
+    {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable){return pair[1];}
+        }
+        return(false);
+    }
+    var goodsInfo_setting = {
+        "async" : true,
+        "crossDomain" : true,
+        "url" : "http://dev-jh-api.kurly.com/v1/goods/" + goodsId,
+        "method" : "GET",
+        "headers" : {}
+    }
+    $.ajax(goodsInfo_setting).done(function(response){
+        var goodsSection ="";
+        console.log(response);
+        // 상품에 대한 상세 설명을 담고 있는 이미지의 변수
+        goodsSection += response.data[0].goodInfo;
+        var infoPath = getGoodsInfo(goodsSection);
+        var imgBase = "http://img-cf.kurly.com";
+        var detailInfo = "";
+        $("#goodsTitle").html(response.data[0].goodsName); // 상품 이름
+        $("#goodsThumbnail").html("<img src='http://img-cf.kurly.com/shop/data/goods/"
+                + response.data[0].thumbnailUrl+"' style='width:100%;'>"); // 상품 썸네일 이미지
+        $("#goodsIntroduction").html(response.data[0].goodsIntroduction);
+        $("#goodsPrice").html( "가격 : " + response.data[0].goodsPrice.toLocaleString() + " 원"); // 상품 가격
+        $("#goodsStock").html( "재고 : " + response.data[0].goodsStock); // 상품 재고량
+        // 이미지 파일 형식이 올바르지 못한 경우 ( utf-8 포함 시 생기는 경우 ) 처리
+        var validateFile;
+        for(var imgIter = 0; imgIter < infoPath.length; imgIter++){
+
+            var cutFileName ="";
+            validateFile = infoPath[imgIter][infoPath[imgIter].length-3]
+                    + infoPath[imgIter][infoPath[imgIter].length-2]
+                    + infoPath[imgIter][infoPath[imgIter].length-1];
+            // getGoodsInfo함수를 통해 받아온 데이터의 마지막이 jpg인지 아닌지 확인한다. ( 보통 jpg파일을 통해 상세설명을 하기때문)
+            if(validateFile != "jpg") {
+                for (var i = 0; i < infoPath[imgIter].length; i++) {
+                    // 데이터의 마지막이 jpg인지 아닌지 확인하기 위해 스트링의 인덱스마다 확인한다.
+                    var textCompare = infoPath[imgIter][i] + infoPath[imgIter][i + 1] + infoPath[imgIter][i + 2];
+
+                    if (textCompare == "jpg") {
+                        // jpg가 맞는지 확인이 되었다면 그때까지의 스트링을 데이터로 저장해준다.
+                        infoPath[imgIter] = infoPath[imgIter].substr(0, i+3);
+                    }
+                }
+            }
+            console.log("imgIter[" + imgIter + "] : " + infoPath[imgIter]);
+            detailInfo += "<img src='" + imgBase + infoPath[imgIter] + "'style=\"width:100%;\">";
+        }
+        $("#goodsDetailInfo").html(detailInfo); // 상품 상세 설명(이미지)
+        //img-cf.kurly.com/
+        //$("#test").html(goodsSection);
+    });
+    /* DB내에 있는 longdesc 컬럼의 데이터를 분할해주기 위해 작성한 함수.
+    *  longdesc 데이터에 있는 이미지 경로들은 한 로컬 내에서 파일 경로를 가져와서 사용하고 있기에
+    *  해당 이미지들을 http를 통해 가져와서 보여주기 위함이다.
+    */
+    function getGoodsInfo(imgpath)
+    {
+        var infoSection = imgpath.split(" src=\"");
+        var infoList = [];
+        for( var i = 1 ; i < infoSection.length; i++){
+            var tempinfoList;
+            tempinfoList = infoSection[i].split("\" data-src=\""); // infoSection내부에 있는 파일 이름들을 data-src로 split하게 되면
+                                                                     // tempinfoList변수의 index : 0에 img src들만이 담긴다.
+
+            // 위의 방식으로 데이터를 자르다보면 파일이름과 확장자만이 데이터로 남지 않는 경우가 있다.
+            // ex) "/shop/data/images/etc/paper/5453_01.jpg"></p>
+            // 위와 같은 경우에 img-path를 파싱하기 위하여 아래의 구문을 이용한다.
+            /*if(tempinfoList[0].substr(tempinfoList[0].length-1, tempinfoList[0].length-1) != 'g'
+                &&tempinfoList[0].substr(tempinfoList[0].length-2, tempinfoList[0].length-2) != 'p'){// img path 마지막이 pg로 끝나는지 아닌지 확인. ( 문제가 있음. bmp, gif인 경우는 어떡할 것인가.. )
+
+                var tempExpand = "";
+                var jpgIter = 1;
+                while(tempExpand != "jpg") { // 맨마지막 파일내용이 jpg가 될때까지 tempinfoList[0] 배열의 인덱스 값을 수정하며 확인하고
+                                                // jpgIter라는 변수를 통해 해당 인덱스를 기억한다.
+                    //console.log("now keyword");
+                    //console.log(tempinfoList[0].length - (jpgIter + 2), tempinfoList[0].length - (jpgIter));
+                    //console.log(tempinfoList[0][tempinfoList[0].length-jpgIter-2]+tempinfoList[0][tempinfoList[0].length-jpgIter-1]+tempinfoList[0][tempinfoList[0].length-jpgIter-0]);
+
+                    tempExpand = tempinfoList[0][tempinfoList[0].length - jpgIter - 2] + tempinfoList[0][tempinfoList[0].length - jpgIter - 1] + tempinfoList[0][tempinfoList[0].length - jpgIter - 0];
+                    // 해당하는 img-path의 마지막이 jpg로 정확히 파일이름과 경로를 뽑을 때까지 작업을 반복한다.
+
+//                    console.log("tempexpand : "  + tempExpand);
+
+                    jpgIter++;
+                }
+                jpgIter -= 2;
+                //console.log(tempinfoList[0].length-jpgIter);
+                tempinfoList[0] = tempinfoList[0].substr(0,tempinfoList[0].length-jpgIter); // 위의 while문을 통해 나온 jpgIter값을 통해 0부터 "jpg"가 나오는 부분을 저장한다.
+
+                //console.log("tempinfoList : " + tempinfoList[0]);
+                 // l-3 ~ l-1
+            }*/
+            infoList.push(tempinfoList[0]); // 위에서 나온 각 tempinfoList[0]값을 infoList라는 배열에 저장하여 리턴해준다.
+        }
+        return infoList;
+    }
+</script>
+</body>
+</html>
